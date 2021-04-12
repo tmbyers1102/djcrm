@@ -31,3 +31,4 @@ To run this project you will need to set your environment variables.
 <a href="https://www.twitter.com/justdjangocode" target="_blank"><img src="https://img.shields.io/badge/Twitter-%231877F2.svg?&style=flat-square&logo=twitter&logoColor=white" alt="Twitter"></a>
 
 </div>
+# getting-started-with-django
