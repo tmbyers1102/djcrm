@@ -1,23 +1,22 @@
 import random
-
-from django.core.mail import send_mail
 from django.views import generic
+from django.core.mail import send_mail
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import reverse
 from leads.models import Agent
 from .forms import AgentModelForm
-from .mixins import OrganisorAndLoginRequiredMixin
+from .mixins import OrganizerAndLoginRequiredMixin
 
 
-class AgentListView(OrganisorAndLoginRequiredMixin, generic.ListView):
+class AgentListView(OrganizerAndLoginRequiredMixin, generic.ListView):
     template_name = "agents/agent_list.html"
     
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        request_user_organization = self.request.user.userprofile
+        return Agent.objects.filter(organization=request_user_organization)
 
 
-class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
+class AgentCreateView(OrganizerAndLoginRequiredMixin, generic.CreateView):
     template_name = "agents/agent_create.html"
     form_class = AgentModelForm
 
@@ -25,34 +24,34 @@ class AgentCreateView(OrganisorAndLoginRequiredMixin, generic.CreateView):
         return reverse("agents:agent-list")
 
     def form_valid(self, form):
-        user = form.save(commit=False)
+        user=form.save(commit=False)
         user.is_agent = True
-        user.is_organisor = False
-        user.set_password(f"{random.randint(0, 1000000)}")
+        user.is_organizer = False
+        user.set_password(f"{random.randint(0,1000000)}")
         user.save()
         Agent.objects.create(
             user=user,
-            organisation=self.request.user.userprofile
+            organization=self.request.user.userprofile
         )
         send_mail(
-            subject="You are invited to be an agent",
+            subject="You are invited to be an agent on DJCRM!",
             message="You were added as an agent on DJCRM. Please come login to start working.",
-            from_email="admin@test.com",
+            from_email="admin@djcrm.com",
             recipient_list=[user.email]
         )
         return super(AgentCreateView, self).form_valid(form)
 
 
-class AgentDetailView(OrganisorAndLoginRequiredMixin, generic.DetailView):
+class AgentDetailView(OrganizerAndLoginRequiredMixin, generic.DetailView):
     template_name = "agents/agent_detail.html"
     context_object_name = "agent"
-
+    
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        request_user_organization = self.request.user.userprofile
+        return Agent.objects.filter(organization=request_user_organization)
 
 
-class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
+class AgentUpdateView(OrganizerAndLoginRequiredMixin, generic.UpdateView):
     template_name = "agents/agent_update.html"
     form_class = AgentModelForm
 
@@ -60,11 +59,11 @@ class AgentUpdateView(OrganisorAndLoginRequiredMixin, generic.UpdateView):
         return reverse("agents:agent-list")
 
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        request_user_organization = self.request.user.userprofile
+        return Agent.objects.filter(organization=request_user_organization)
 
 
-class AgentDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
+class AgentDeleteView(OrganizerAndLoginRequiredMixin, generic.DeleteView):
     template_name = "agents/agent_delete.html"
     context_object_name = "agent"
 
@@ -72,5 +71,6 @@ class AgentDeleteView(OrganisorAndLoginRequiredMixin, generic.DeleteView):
         return reverse("agents:agent-list")
 
     def get_queryset(self):
-        organisation = self.request.user.userprofile
-        return Agent.objects.filter(organisation=organisation)
+        request_user_organization = self.request.user.userprofile
+        return Agent.objects.filter(organization=request_user_organization)
+
