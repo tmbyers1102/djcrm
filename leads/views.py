@@ -3,7 +3,14 @@ from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from .models import Lead, Agent, Category
-from .forms import LeadForm, LeadModelForm, CustomUserCreationForm, AssignAgentForm, LeadCategoryUpdateForm
+from .forms import (
+    LeadForm,
+    LeadModelForm,
+    CustomUserCreationForm,
+    AssignAgentForm, 
+    LeadCategoryUpdateForm,
+    CategoryModelForm
+)
 from django.views import generic
 from agents.mixins import OrganizerAndLoginRequiredMixin
 
@@ -235,6 +242,72 @@ class LeadCategoryUpdateView(LoginRequiredMixin,generic.UpdateView):
 
     def get_success_url(self):
         return reverse('leads:lead-detail', kwargs={"pk": self.get_object().id})
+
+
+class CategoryCreateView(OrganizerAndLoginRequiredMixin, generic.CreateView):
+    template_name = "leads/category_create.html"
+    form_class = CategoryModelForm
+
+    def get_success_url(self):
+        return reverse('leads:category-list')
+
+    def form_valid(self, form):
+        # this assigns the signed in person's org as the lead's org
+        category = form.save(commit=False)
+        category.organization = self.request.user.userprofile
+        category.save()
+        return super(CategoryCreateView, self).form_valid(form)
+
+
+class CategoryUpdateView(OrganizerAndLoginRequiredMixin, generic.UpdateView):
+    template_name = "leads/category_update.html"
+    form_class = CategoryModelForm
+
+    def get_success_url(self):
+        return reverse('leads:category-list')
+
+    def get_queryset(self):
+        # grabs the logged in user (must be logged in)
+        user = self.request.user
+        # this if statement wants to narrow all leads down to one Org, so...
+        # checks to see if user has is_org designation
+        if user.is_organizer:
+            # if so, narrows to one org by user's org as defined in profile model
+            queryset = Category.objects.filter(
+                organization=user.userprofile,
+            )
+        else:
+            # if not an organizer, narrows QS to one org as defined in agent model
+            queryset = Category.objects.filter(
+                organization=user.agent.organization,
+            )
+        return queryset
+
+
+class CategoryDeleteView(OrganizerAndLoginRequiredMixin, generic.DeleteView):
+    template_name = "leads/category_delete.html"
+
+    def get_success_url(self):
+        return reverse('leads:category-list')
+
+
+
+    def get_queryset(self):
+        # grabs the logged in user (must be logged in)
+        user = self.request.user
+        # this if statement wants to narrow all leads down to one Org, so...
+        # checks to see if user has is_org designation
+        if user.is_organizer:
+            # if so, narrows to one org by user's org as defined in profile model
+            queryset = Category.objects.filter(
+                organization=user.userprofile,
+            )
+        else:
+            # if not an organizer, narrows QS to one org as defined in agent model
+            queryset = Category.objects.filter(
+                organization=user.agent.organization,
+            )
+        return queryset
 
 
 def landing_page(request):
