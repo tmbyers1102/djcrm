@@ -1,7 +1,7 @@
-python manage.py collectstatic --no-input
+python3 manage.py collectstatic --no-input
 
-python manage.py migrate auth
+python3 manage.py migrate auth
 
-python manage.py migrate
+python3 manage.py migrate
 
 gunicorn --worker-tmp-dir /dev/shm djcrm.wsgi
