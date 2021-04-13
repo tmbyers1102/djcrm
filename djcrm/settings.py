@@ -9,11 +9,11 @@ READ_DOT_ENV_FILE = env.bool('READ_DOT_ENV_FILE', default=False)
 if READ_DOT_ENV_FILE:
     environ.Env.read_env()
 
-# DEBUG = env('DEBUG')
-# SECRET_KEY = env('SECRET_KEY')
+DEBUG = env('DEBUG')
+SECRET_KEY = env('SECRET_KEY')
 
-DEBUG = os.environ.get('DEBUG')
-SECRET_KEY = os.environ.get('SECRET_KEY')
+# DEBUG = os.environ.get('DEBUG')
+# SECRET_KEY = os.environ.get('SECRET_KEY')
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
