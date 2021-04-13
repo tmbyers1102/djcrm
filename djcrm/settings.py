@@ -7,7 +7,7 @@ env = environ.Env(
 
 READ_DOT_ENV_FILE = env.bool('READ_DOT_ENV_FILE', default=False)
 if READ_DOT_ENV_FILE:
-    environ.Env.read_env()
+    os.environ.Env.read_env()
 
 # DEBUG = env('DEBUG')
 # SECRET_KEY = env('SECRET_KEY')
